@@ -1,5 +1,13 @@
 import os
 import re
+import sys
+
+ADB_PATH = None
+system_name = sys.platform
+if system_name == "win32":
+    ADB_PATH = os.path.join(sys.path[0], "bin", "windows", "adb.exe")
+else:
+    raise NotImplementedError
 
 class CmdRunningError(Exception):
 
@@ -38,7 +46,10 @@ class AdbRunner(object):
     def update_devices(self):
         # update self.devices_info
 
-        devices_output = self._run_cmd("adb devices")
+        devices_output = self._run_cmd("%s devices"%(ADB_PATH))
+        
+        if len(devices_output) == 0:
+            raise CmdRunningError("Get unexpected result running 'adb devices'.")
 
         if devices_output[0] != "List of devices attached":
             raise CmdRunningError("Get unexpected result '%s' running 'adb devices'."%(devices_output[0]))
@@ -62,7 +73,7 @@ class AdbRunner(object):
         # get device resolution
 
         def build_resolution_cmd(device):
-            return "adb -s %s shell wm size"%(device)
+            return "%s -s %s shell wm size"%(ADB_PATH, device)
         
         pattern = re.compile(r'\d+')
         devices = list(self.device_info.keys()) if dev is None else [dev]
@@ -76,7 +87,7 @@ class AdbRunner(object):
         # get screen shot
 
         def build_screencap_cmd(device, output):
-            return "adb -s %s exec-out screencap -p > %s"%(device, output)
+            return "%s -s %s exec-out screencap -p > %s"%(ADB_PATH, device, output)
 
         devices = list(self.device_info.keys()) if dev is None else [dev]
         for dev in devices:
@@ -91,7 +102,7 @@ class AdbRunner(object):
         # tap once
 
         def build_tap_cmd(device, pos):
-            return "adb -s %s shell input tap %d %d"%(device, pos[0], pos[1])
+            return "%s -s %s shell input tap %d %d"%(ADB_PATH, device, pos[0], pos[1])
         
         devices = list(self.device_info.keys()) if dev is None else [dev]
         for dev in devices:
@@ -105,8 +116,8 @@ class AdbRunner(object):
         # swipe
 
         def build_swipe_cmd(device, src_pos, aim_pos, time):
-            return "adb -s %s shell input swipe %d %d %d %d %d"%(
-                device, src_pos[0], src_pos[1], aim_pos[0], aim_pos[1], time
+            return "%s -s %s shell input swipe %d %d %d %d %d"%(
+                ADB_PATH, device, src_pos[0], src_pos[1], aim_pos[0], aim_pos[1], time
             )
         
         devices = list(self.device_info.keys()) if dev is None else [dev]
