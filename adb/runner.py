@@ -6,6 +6,8 @@ ADB_PATH = None
 system_name = sys.platform
 if system_name == "win32":
     ADB_PATH = os.path.join(sys.path[0], "bin", "windows", "adb.exe")
+elif system_name == "darwin":
+    ADB_PATH = os.path.join(sys.path[0], "bin", "mac", "adb")
 else:
     raise NotImplementedError
 
@@ -80,8 +82,8 @@ class AdbRunner(object):
         for dev in devices:
             resolution_output = self._run_cmd(build_resolution_cmd(dev))[0]
             w, h = pattern.findall(resolution_output)
-            self.device_info[dev]["height"] = h
-            self.device_info[dev]["width"] = w
+            self.device_info[dev]["height"] = int(h)
+            self.device_info[dev]["width"] = int(w)
     
     def screen_shot(self, dev=None):
         # get screen shot
@@ -98,7 +100,7 @@ class AdbRunner(object):
                 )
             )
 
-    def tap(self, pos, dev=None):
+    def tap(self, pos, dev=None, norm_pos=False):
         # tap once
 
         def build_tap_cmd(device, pos):
@@ -106,13 +108,19 @@ class AdbRunner(object):
         
         devices = list(self.device_info.keys()) if dev is None else [dev]
         for dev in devices:
-            self._run_cmd(build_tap_cmd(dev, pos))
+            tap_pos = pos
+            if norm_pos:
+                tap_pos = [
+                    int(pos[0] * self.device_info[dev]["width"]),
+                    int(pos[1] * self.device_info[dev]["height"])
+                ]
+            self._run_cmd(build_tap_cmd(dev, tap_pos))
 
-    def multi_tap(self, dev, pos, times, interval=50):
+    def multi_tap(self, dev, pos, times, interval=50, norm_pos=False):
         # tap several times
         raise NotImplementedError("Multiple tap not implemented yet.")
 
-    def swipe(self, src_pos, aim_pos, time=100, dev=None):
+    def swipe(self, src_pos, aim_pos, time=100, dev=None, norm_pos=False):
         # swipe
 
         def build_swipe_cmd(device, src_pos, aim_pos, time):
@@ -122,4 +130,15 @@ class AdbRunner(object):
         
         devices = list(self.device_info.keys()) if dev is None else [dev]
         for dev in devices:
-            self._run_cmd(build_swipe_cmd(dev, src_pos, aim_pos, time))
+            swipe_src = src_pos
+            swipe_aim = aim_pos
+            if norm_pos:
+                swipe_src = [
+                    int(src_pos[0] * self.device_info[dev]["width"]),
+                    int(src_pos[1] * self.device_info[dev]["height"])
+                ]
+                swipe_aim = [
+                    int(aim_pos[0] * self.device_info[dev]["width"]),
+                    int(aim_pos[1] * self.device_info[dev]["height"])
+                ]
+            self._run_cmd(build_swipe_cmd(dev, swipe_src, swipe_aim, time))
