@@ -1,7 +1,7 @@
 import time
 
-from dfa.condition import AbsCondition
-from dfa.state import State
+#from dfa.condition import AbsCondition
+#from dfa.state import State
 
 class Transition:
 
@@ -13,7 +13,7 @@ class Transition:
 
 class SequentialTransition(Transition):
 
-    def __init__(self, aim_state: State) -> None:
+    def __init__(self, aim_state) -> None:
         super().__init__()
         self.aim_state = aim_state
     
@@ -33,7 +33,7 @@ class CondTransition(Transition):
 
     def __init__(
         self,
-        aim_state: State, cond: AbsCondition,
+        aim_state, cond,
         retry_interval: float = 1.0, max_retry: int = 10
     ) -> None:
         super().__init__()
@@ -90,5 +90,5 @@ class MultiCondTransition(Transition):
                     return self.aim_states[state_idx]
             time.sleep(self.retry_interval)
         
-        raise CondTimeOutError("Timeout for condition '%s'."%(self.cond.descrip))
+        raise CondTimeOutError("Timeout for multi conditions.")
         

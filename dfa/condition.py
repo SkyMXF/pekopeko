@@ -61,12 +61,34 @@ class TimerCondition(AbsCondition):
             return True
         return False
 
+class CounterCondition(AbsCondition):
+
+    def __init__(self, times, first_true=True, descrip="") -> None:
+        super().__init__(descrip)
+
+        self.counter = 0
+        self.max_times = times
+        self.first_true = first_true
+    
+    def __call__(self):
+        result = False
+        if self.first_true and (self.counter == 0):
+            result = True
+        self.counter += 1
+        if (not self.first_true) and (self.counter == self.max_times):
+            result = True
+        if self.counter == self.max_times:
+            self.counter = 0
+        
+        return result
+            
 class FindTemplateCondition(AbsCondition):
 
     def __init__(
         self,
         template_file,
         screen_file,
+        adb_runner,
         pos=None,
         threshold=0.8,
         grayscale=True,
@@ -81,6 +103,8 @@ class FindTemplateCondition(AbsCondition):
     ) -> None:
         # pos is None: find in whole screen
         super().__init__(descrip)
+
+        self.adb_runner = adb_runner
 
         if pos is None:
             def find():
@@ -119,4 +143,5 @@ class FindTemplateCondition(AbsCondition):
         self.cond = find
     
     def __call__(self):
+        self.adb_runner.screen_shot()
         return self.cond()

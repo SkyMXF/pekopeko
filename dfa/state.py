@@ -1,5 +1,5 @@
-from dfa.transition import Transition
-from dfa.operation import Operation
+#from .transition import Transition
+#from .operation import Operation
 
 class UnknownStateError(Exception):
 
@@ -12,7 +12,7 @@ class UnknownStateError(Exception):
 
 class State:
 
-    def __init__(self, descrip, operation: Operation, transition: Transition = None) -> None:
+    def __init__(self, descrip, operation = None, transition = None) -> None:
         self.descrip = descrip
         self.operation = operation
         self.transition = transition

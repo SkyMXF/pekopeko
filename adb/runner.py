@@ -6,6 +6,7 @@ ADB_PATH = None
 system_name = sys.platform
 if system_name == "win32":
     ADB_PATH = os.path.join(sys.path[0], "bin", "windows", "adb.exe")
+    os.system("%s devices"%(ADB_PATH))
 elif system_name == "darwin":
     ADB_PATH = os.path.join(sys.path[0], "bin", "mac", "adb")
 else:

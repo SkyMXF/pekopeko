@@ -14,11 +14,12 @@ class Operation:
 
 class TapOperation(Operation):
 
-    def __init__(self, runner: adb.AdbRunner, pos, device, descrip="") -> None:
+    def __init__(self, runner: adb.AdbRunner, pos, device, delay=1.0, descrip="") -> None:
         super().__init__(descrip)
 
         def run():
-            runner.tap(pos=pos, dev=device, normpos=True)
+            time.sleep(delay)
+            runner.tap(pos=pos, dev=device, norm_pos=True)
         
         self.op = run
 
