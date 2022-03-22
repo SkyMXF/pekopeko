@@ -139,7 +139,7 @@ op_clear_team_member = ForOperation(
         runner=adb_runner,
         pos=pos_clear_team_member,
         device=device,
-        delay=0.3
+        delay=0.2
     ), times=7, descrip="clear team member"
 )
 op_clear_all_team_member = SequentialOperation(
@@ -148,13 +148,15 @@ op_clear_all_team_member = SequentialOperation(
         TapOperation(
             runner=adb_runner,
             pos=pos_team_2_button,
-            device=device
+            device=device,
+            delay=0.5
         ),
         op_clear_team_member,
         TapOperation(
             runner=adb_runner,
             pos=pos_team_3_button,
-            device=device
+            device=device,
+            delay=0.5
         ),
         op_clear_team_member
     ], descrip="clear all team member"
@@ -163,7 +165,8 @@ op_press_my_team_button = TapOperation(
     runner=adb_runner,
     pos=pos_my_team_button,
     device=device,
-    descrip="press my team button"
+    descrip="press my team button",
+    delay=0.7
 )
 op_clear_and_my_team = SequentialOperation(
     ops=[
@@ -385,10 +388,10 @@ if __name__ == "__main__":
             group_id = 1
             switch12 = True
         reset_choose_team_op(group_id=group_id, switch12=switch12)
-        print("Reset group id as %d"%(group_id))
+        print("Reset group id as %d, switch12 %s"%(group_id, str(switch12)))
 
         run_dfa()       # cost 35s
         print("Finish changing team. Sleeping...")
-        time.sleep(70)
+        time.sleep(40)
 
     
