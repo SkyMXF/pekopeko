@@ -304,7 +304,7 @@ trans_finish_state = SequentialTransition(
 state_my_team[2].operation = op_choose_group_and_team_and_return
 state_my_team[2].transition = trans_finish_state
 
-def reset_choose_team_op(group_id, reverse=False):
+def reset_choose_team_op(group_id, reverse=False, switch12=False):
 
     global state_my_team
     
@@ -313,7 +313,7 @@ def reset_choose_team_op(group_id, reverse=False):
     op_choose_group_and_team_and_return = SequentialOperation(
         ops=[
             op_choose_team_group,
-            op_press_choose_button_0,
+            op_press_choose_button_1 if switch12 else op_press_choose_button_0,
             TapOperation(
                 runner=adb_runner,
                 pos=pos_team_2_button,
@@ -329,7 +329,7 @@ def reset_choose_team_op(group_id, reverse=False):
     op_choose_group_and_team_and_return = SequentialOperation(
         ops=[
             op_choose_team_group,
-            op_press_choose_button_1,
+            op_press_choose_button_0 if switch12 else op_press_choose_button_1,
             TapOperation(
                 runner=adb_runner,
                 pos=pos_team_3_button,
@@ -376,13 +376,15 @@ def run_dfa():
 if __name__ == "__main__":
     
     group_id = 0
+    switch12 = False
 
     while True:
     
         group_id += 1
         if group_id > 4:
             group_id = 1
-        reset_choose_team_op(group_id=group_id)
+            switch12 = True
+        reset_choose_team_op(group_id=group_id, switch12=switch12)
         print("Reset group id as %d"%(group_id))
 
         run_dfa()       # cost 35s
