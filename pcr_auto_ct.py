@@ -71,11 +71,16 @@ state_my_team = [State(descrip="my team %d view"%(i)) for i in range(3)]
 state_finish_team = [State(descrip="finish editing team %d view"%(i)) for i in range(3)]
 
 # main view -> adventure view
-op_press_adventure = TapOperation(
-    runner=adb_runner,
-    pos=pos_adventure,
-    device=device,
-    descrip="press adventure"
+op_press_adventure = ForOperation(
+    op=TapOperation(
+        runner=adb_runner,
+        pos=pos_adventure,
+        device=device,
+        descrip="press adventure",
+        delay=0.3
+    ),
+    times=7,
+    descrip="multi press adventure"
 )
 cond_find_princess_arena = FindTemplateCondition(
     template_file=os.path.join(resources_dir, "princessArena.png"),
@@ -380,18 +385,22 @@ if __name__ == "__main__":
     
     group_id = 0
     switch12 = False
+    reverse = False
 
     while True:
     
         group_id += 1
         if group_id > 4:
             group_id = 1
-            switch12 = True
-        reset_choose_team_op(group_id=group_id, switch12=switch12)
-        print("Reset group id as %d, switch12 %s"%(group_id, str(switch12)))
+            #switch12 = not switch12
+            reverse = not reverse
+
+        reset_choose_team_op(group_id=group_id, switch12=switch12, reverse=reverse)
+        print("Reset group id as %d, switch12 %s, reverse %s"%(group_id, str(switch12), str(reverse)))
 
         run_dfa()       # cost 35s
         print("Finish changing team. Sleeping...")
-        time.sleep(40)
+        #time.sleep(40)
+        time.sleep(2)
 
     
